@@ -196,8 +196,26 @@ const CoFounderForm = ({ selectedRole }) => {
     <div>
       <h2>Co-founder Form</h2>
       <form onSubmit={handleSubmit}>
-        {/* The rest of your form fields go here... */}
-
+        <label>
+          Phone Number:
+          <input
+            type="text"
+            name="phoneNumber"
+            value={formValues.phoneNumber}
+            onChange={handleChange}
+          />
+        </label>
+        <br />
+        <label>
+          Profession:
+          <input
+            type="text"
+            name="profession"
+            value={formValues.profession}
+            onChange={handleChange}
+          />
+        </label>
+        <br />
         <label>
           Looking to Be:
           <Select
