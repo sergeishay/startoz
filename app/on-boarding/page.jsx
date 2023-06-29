@@ -71,7 +71,7 @@ const OnBoarding = () => {
       </div>
 
       {/* Display forms here based on the selected role */}
-      {selectedRole === 'Co-founder' && <CoFounderForm selectedRole={selectedRole} />}
+      {selectedRole === 'Co-founder' && <CoFounderForm selectedRole={selectedRole} sessionEmail={sessionEmail} />}
       {/* {selectedRole === 'Investors' && <InvestorForm />}
       {selectedRole === 'Entrepreneur' && <EntrepreneurForm />}
   {selectedRole === 'Providers services' && <ProviderForm />} */}

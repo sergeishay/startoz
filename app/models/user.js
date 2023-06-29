@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
 
-const options = { discriminatorKey: 'userType' }; // Our discriminator field
-
 const UserSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -21,7 +19,11 @@ const UserSchema = new mongoose.Schema({
   isFirstVisit: {
     type: Boolean,
     default: true,
+  },
+  roles: {
+    type: [String], 
+    default: []
   }
-}, options); // We add our options to the base schema
+});
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);

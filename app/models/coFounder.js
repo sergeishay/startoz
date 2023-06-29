@@ -1,7 +1,7 @@
-import User from './user';
 import mongoose from 'mongoose';
 
 const CoFounderSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   phoneNumber: String,
   profession: String,
   lookingToBe: [String], // array of strings
@@ -17,4 +17,4 @@ const CoFounderSchema = new mongoose.Schema({
   // cv: String // You could store file path if file is uploaded or base64 string.
 });
 
-export default User.discriminator('CoFounder', CoFounderSchema);
+export default mongoose.models.CoFounder || mongoose.model('CoFounder', CoFounderSchema);

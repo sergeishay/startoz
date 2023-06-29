@@ -8,10 +8,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import countryList from "react-select-country-list";
 import { toast } from "react-hot-toast";
 
-const CoFounderForm = ({ selectedRole }) => {
+const CoFounderForm = ({ selectedRole, sessionEmail }) => {
   // console.log(sessionEmail)
   const [formValues, setFormValues] = useState({
-    // sessionEmail: sessionEmail || '' ,
+    sessionEmail: sessionEmail || '' ,
     selectedRole,
     phoneNumber: "",
     profession: "",
@@ -26,9 +26,9 @@ const CoFounderForm = ({ selectedRole }) => {
     personalWeb: "",
     linkedInProfileLink: "",
     // cv: null,
-    // customLookingToBe: "",
-    // customSector: "",
-    // customSkill: "",
+    customLookingToBe: "",
+    customSector: "",
+    customSkill: "",
   });
 
   const countryOptions = countryList().getData();
