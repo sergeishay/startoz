@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 import axios from "axios";
 import Select from "react-select";
@@ -9,23 +7,21 @@ import countryList from "react-select-country-list";
 import { toast } from "react-hot-toast";
 
 const CoFounderForm = ({ selectedRole, sessionEmail }) => {
-  // console.log(sessionEmail)
   const [formValues, setFormValues] = useState({
-    sessionEmail: sessionEmail || '' ,
+    sessionEmail: sessionEmail || '',
     selectedRole,
     phoneNumber: "",
     profession: "",
     lookingToBe: [],
     desiredSectors: [],
     country: "",
-    // city: "",
     dateOfBirth: null,
     aboutMe: "",
     experience: "",
     skills: [],
     personalWeb: "",
     linkedInProfileLink: "",
-    // cv: null,
+    cv: null,
     customLookingToBe: "",
     customSector: "",
     customSkill: "",
@@ -103,13 +99,6 @@ const CoFounderForm = ({ selectedRole, sessionEmail }) => {
     }));
   };
 
-  const handleCityChange = (selectedOption) => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      city: selectedOption.value,
-    }));
-  };
-
   const handleChange = (e) => {
     setFormValues((prevValues) => ({
       ...prevValues,
@@ -136,59 +125,36 @@ const CoFounderForm = ({ selectedRole, sessionEmail }) => {
     e.preventDefault();
 
     try {
-      // // Create form data to send files
       const formData = new FormData();
-      // formData.append("cv", formValues.cv);
+      formData.append("cv", formValues.cv);
 
-      // Append other form values to the form data
-      // Object.keys(formValues).forEach((key) => {
-      // if (key !== "cv") {
-      // formData.append(key, formValues[key]);
-      // }
-      // });
+      Object.entries(formValues).forEach(([key, value]) => {
+        if (key !== "cv") {
+          formData.append(key, value);
+        }
+      });
 
-      // Print the form data to the console
-      console.log("Form data:", formValues);
-      // console.log(typeof formData)
-      // Send the form data to the server or API endpoint
-      const response = await axios.post("/api/on-boarding", formValues);
-      // });
+      const response = await axios.post("/api/on-boarding", formData);
+      console.log(response.data);
 
-      console.log(response);
-
-      // Reset the form values after successful submission
-      setFormValues({
+      setFormValues((prevValues) => ({
+        ...prevValues,
         phoneNumber: "",
         profession: "",
         lookingToBe: [],
         desiredSectors: [],
         country: "",
-        // city: "",
         dateOfBirth: null,
         aboutMe: "",
         experience: "",
         skills: [],
         personalWeb: "",
         linkedInProfileLink: "",
-        // cv: null,
-      });
+        cv: null,
+      }));
     } catch (error) {
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else if (error.request) {
-        // The request was made but no response was received
-        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-        // http.ClientRequest in node.js
-        console.log(error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.log("Error", error.message);
-      }
-      console.log(error.config);
+      console.error(error);
+      toast.error("Something went wrong");
     }
   };
 

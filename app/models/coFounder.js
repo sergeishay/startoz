@@ -14,7 +14,7 @@ const CoFounderSchema = new mongoose.Schema({
   skills: [String], // array of strings
   personalWeb: String,
   linkedInProfileLink: String,
-  // cv: String // You could store file path if file is uploaded or base64 string.
+  cv: String // You could store file path if file is uploaded or base64 string.
 });
 
 export default mongoose.models.CoFounder || mongoose.model('CoFounder', CoFounderSchema);
