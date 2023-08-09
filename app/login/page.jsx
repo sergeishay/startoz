@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { signIn, signOut, useSession, getProviders } from 'next-auth/react';
 import { toast } from "react-hot-toast"
 import { useRouter } from "next/navigation"
 import Link from 'next/link';
 import Image from 'next/image';
+import { UserContext } from '@/context/UserContext';
 
 import googleicon from '../../public/assets/icons/google2.svg';
 import facebookicon from '../../public/assets/icons/Vector.svg';
@@ -20,7 +21,8 @@ const Login = () => {
   const router = useRouter()
   const { data: session, status } = useSession();
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
-
+  const { user, setUser } = useContext(UserContext);
+  console.log(session)
   useEffect(() => {
     if (status === "authenticated") {
       // Check if it's the user's first visit
@@ -34,22 +36,7 @@ const Login = () => {
     }
   }, [status, session]);
 
-// const signInUser = async (provider) => {
-//     const result =await  signIn(provider);
-//     console.log(result)
-//     if (result.error) {
-//         console.log(result.error);
-//     } else {
-//         // Check if it's the user's first visit
-//         if (result.isFirstVisit) {
-//             // If it's the user's first visit, redirect to the onboarding page
-//             router.push('/on-boarding');
-//         } else {
-//             // If it's not the user's first visit, redirect to the profile page
-//             router.push('/profile');
-//         }
-//     }
-// };
+
 
 
   const userLogin = async (e) => {

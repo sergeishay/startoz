@@ -1,13 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import countryList from "react-select-country-list";
 import { toast } from "react-hot-toast";
+import { signIn, signOut, useSession, getProviders } from "next-auth/react";
+import Image from "next/image";
+
 // import { Storage } from "@google-cloud/storage"; // Import the Storage class from @google-cloud/storage
+import { uploadPhoto } from '@/actions/uploadActions';
 
 const CoFounderForm = ({ selectedRole, sessionEmail }) => {
   console.log(sessionEmail); // add this to check the prop value
@@ -38,7 +42,9 @@ const CoFounderForm = ({ selectedRole, sessionEmail }) => {
     customSector: "",
     customSkill: "",
   });
-
+  const [files, setFiles] = useState(null);
+  const [urlFile, setUrlFile] = useState("");
+  const { data: session, status } = useSession();
   const countryOptions = countryList().getData();
 
   const handleLookingToBe = (selectedOptions) => {
@@ -104,6 +110,18 @@ const CoFounderForm = ({ selectedRole, sessionEmail }) => {
     }
   };
 
+
+  const handleInputFile = async (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+    // const base64 = await convertBase64(file);
+    const urlFormat = URL.createObjectURL(file);
+    console.log(file);
+    console.log(typeof file);
+    setFiles(file);
+    setUrlFile(urlFormat);
+  }
+
   const handleCountryChange = (selectedOption) => {
     setFormValues((prevValues) => ({
       ...prevValues,
@@ -147,7 +165,12 @@ const CoFounderForm = ({ selectedRole, sessionEmail }) => {
         formData.append(key, formValues[key]);
       }
     });
+    console.log(files);
+    if(!urlFile.length) return alert('Please choose file');
 
+
+    formData.append('file', files) 
+    const res = await uploadPhoto(formData ,sessionEmail);
     // Log FormData values
     for (var pair of formData.entries()) {
       console.log(pair[0] + ", " + pair[1]);
@@ -267,21 +290,21 @@ const CoFounderForm = ({ selectedRole, sessionEmail }) => {
         {formValues.desiredSectors.some(
           (option) => option.value === "Other"
         ) && (
-          <div>
-            <label>
-              Custom Sector:
-              <input
-                type="text"
-                name="customSector"
-                value={formValues.customSector}
-                onChange={handleChange}
-              />
-            </label>
-            <button type="button" onClick={handleAddCustomSector}>
-              Add Custom Sector
-            </button>
-          </div>
-        )}
+            <div>
+              <label>
+                Custom Sector:
+                <input
+                  type="text"
+                  name="customSector"
+                  value={formValues.customSector}
+                  onChange={handleChange}
+                />
+              </label>
+              <button type="button" onClick={handleAddCustomSector}>
+                Add Custom Sector
+              </button>
+            </div>
+          )}
 
         <br />
         <label>
@@ -393,13 +416,11 @@ const CoFounderForm = ({ selectedRole, sessionEmail }) => {
         </label>
         <br />
         <label>
-          C.V:
-          <input
-            type="file"
-            name="cv"
-            accept=".pdf,.doc,.docx"
-            onChange={handleCVUpload}
-          />
+          Image:
+          <input type="file" name="file" onChange={handleInputFile} />
+          <div>
+            <Image src={urlFile} alt="image" width={200} height={200} />
+          </div>
         </label>
         <br />
         <button type="submit">Submit</button>

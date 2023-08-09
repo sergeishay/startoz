@@ -9,13 +9,14 @@ import Image from "next/image";
 import CoFounderForm from '../../components/onBoarding/CoFounderForm';
 // import InvestorForm from './InvestorForm';
 // import EntrepreneurForm from './EntrepreneurForm';
-// import ProviderForm from './ProviderForm';
+// import ProviderForm from './ProviderForm'
+import ServicesForm from "@/components/onBoarding/ServicesForm";
 
 const OnBoarding = () => {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-  const [selectedRole, setSelectedRole] = useState("Co-founder"); // State to store selected role
+  const [selectedRole, setSelectedRole] = useState("Providers services"); // State to store selected role
   const sessionEmail = session?.user.email
   const handleRoleChange = (event) => {
     setSelectedRole(event.target.value);
@@ -72,9 +73,11 @@ const OnBoarding = () => {
 
       {/* Display forms here based on the selected role */}
       {selectedRole === 'Co-founder' && <CoFounderForm selectedRole={selectedRole} sessionEmail={sessionEmail} />}
-      {/* {selectedRole === 'Investors' && <InvestorForm />}
-      {selectedRole === 'Entrepreneur' && <EntrepreneurForm />}
-  {selectedRole === 'Providers services' && <ProviderForm />} */}
+{/* 
+       {selectedRole === 'Investors' && <InvestorForm selectedRole={selectedRole} />}
+      {selectedRole === 'Entrepreneur' && <EntrepreneurForm selectedRole={selectedRole} />} */}
+      {selectedRole === 'Providers services' && <ServicesForm selectedRole={selectedRole} />} 
+
     </div>
   );
 };

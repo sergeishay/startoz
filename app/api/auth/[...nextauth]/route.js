@@ -73,10 +73,8 @@ const handler = NextAuth({
     async signIn({ account, profile, user, credentials }) {
       try {
         await connectToDB();
-        // console.log({ account, profile, user, credentials });
 
         if (account.provider === "facebook") {
-          // console.log(account.provider + " facebook provid to");
           const userExists = await User.findOne({ email: profile.email });
           if(userExists){
 
@@ -91,12 +89,13 @@ const handler = NextAuth({
           }
         } else if (account.provider === "google") {
           const userExists = await User.findOne({ email: profile.email });
-          // console.log(userExists + " google provid to");
           if (!userExists) {
             await User.create({
               email: profile.email,
               username: profile.name.replace(" ", "").toLowerCase(),
               image: profile.picture,
+              isFirstVisit:true
+
             });
           }
         }
