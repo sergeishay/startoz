@@ -6,7 +6,7 @@ import Profile from '../../../components/Profile/Profile';
 
 import React from 'react'
 
-const ProfilePage = () => {
+const ProfilePageByMail = () => {
 
   const handleEdit = () => {}
 
@@ -29,4 +29,4 @@ const ProfilePage = () => {
   )
 }
 
-export default ProfilePage
+export default ProfilePageByMail

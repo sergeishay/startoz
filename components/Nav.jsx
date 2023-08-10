@@ -52,18 +52,18 @@ const Nav = () => {
     const isUserLoggedIn = false;
     const [providers, setProviders] = useState(null);
     const [toggleDropdown, setToggleDropdown] = useState(false)
-    useEffect(() => {
-        if (status === "authenticated") {
-          // Check if it's the user's first visit
-          if (session.user.isFirstVisit) {
-            // If it's the user's first visit, redirect to the onboarding page
-            router.push('/on-boarding');
-          } else {
-            // If it's not the user's first visit, redirect to the profile page
-            router.push('/profile');
-          }
-        }
-      }, [status, session]);
+    // useEffect(() => {
+    //     if (status === "authenticated") {
+    //       // Check if it's the user's first visit
+    //       if (session.user.isFirstVisit) {
+    //         // If it's the user's first visit, redirect to the onboarding page
+    //         router.push('/on-boarding');
+    //       } else {
+    //         // If it's not the user's first visit, redirect to the profile page
+    //         router.push('/profile');
+    //       }
+    //     }
+    //   }, [status, session]);
     // useEffect(() => {
     //     const setUpProviders = async () => {
     //       const response = await getProviders()

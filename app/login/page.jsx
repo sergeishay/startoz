@@ -10,6 +10,7 @@ import { UserContext } from '@/context/UserContext';
 
 import googleicon from '../../public/assets/icons/google2.svg';
 import facebookicon from '../../public/assets/icons/Vector.svg';
+import axios from "axios";
 
 
 const Login = () => {
@@ -22,19 +23,34 @@ const Login = () => {
   const { data: session, status } = useSession();
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
   const { user, setUser } = useContext(UserContext);
-  console.log(session)
-  useEffect(() => {
+  console.log(session, status)
+
+  const  fetchData = async () => {
     if (status === "authenticated") {
+      console.log(session)
       // Check if it's the user's first visit
       if (session.user.isFirstVisit) {
+        console.log('first visit')
         // If it's the user's first visit, redirect to the onboarding page
-        router.push('/on-boarding');
+        // router.push('/on-boarding');
       } else {
+        console.log('not first visit')
+        try {
+          const response = await axios.get(`/api/users/${session.user.email}`);
+          console.log(response.data);
+        } catch (error) {
+          console.log(error);
+        }
         // If it's not the user's first visit, redirect to the profile page
-        router.push('/profile');
+        // router.push('/profile');
       }
     }
-  }, [status, session]);
+  }
+
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData]);
 
 
 
