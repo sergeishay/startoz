@@ -16,4 +16,4 @@ const InvestorSchema = new mongoose.Schema({
   sector: String,
 });
 
-export default mongoose.models.Investor || mongoose.model('Investors', InvestorSchema);
+export default mongoose.models.Investor || mongoose.model('Investor', InvestorSchema);

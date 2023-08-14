@@ -24,8 +24,8 @@ const Login = () => {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
   const { user, setUser } = useContext(UserContext);
   console.log(session, status)
-
-  const  fetchData = async () => {
+  let withoutEmail = session?.user.email.replace(/@.*$/, "");
+  const fetchData = async () => {
     if (status === "authenticated") {
       console.log(session)
       // Check if it's the user's first visit
@@ -38,11 +38,15 @@ const Login = () => {
         try {
           const response = await axios.get(`/api/users/${session.user.email}`);
           console.log(response.data);
+          setUser(response.data)
+
+          router.push(`/profile/${withoutEmail}`);
+
+
         } catch (error) {
           console.log(error);
         }
         // If it's not the user's first visit, redirect to the profile page
-        // router.push('/profile');
       }
     }
   }
@@ -61,7 +65,7 @@ const Login = () => {
       .then((callback) => {
         console.log(callback)
         if (callback?.error) {
-            toast.error(callback.error)
+          toast.error(callback.error)
         }
         if (callback?.ok && !callback?.error) {
           setIsUserLoggedIn(true)

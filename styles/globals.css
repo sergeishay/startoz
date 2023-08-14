@@ -27,23 +27,17 @@ body {
     )
     rgb(var(--background-start-rgb)); */
 }
-.main {
-  width: 100vw;
+/* .main {
+  width: 100%;
   min-height: 100vh;
-  position: fixed;
   display: flex;
-  justify-content: center;
-  /* padding: 3%; */
+  justify-content: flex-start !important;
   pointer-events: none;
-}
+} */
 
-.main:before {
+/* .main:before {
   background: radial-gradient(linear, hsla(183, 100%, 43%, 0.1) 0, #fafafa 100%);
-  /* background: rgb(251,188,5);
-background: -moz-linear-gradient(114deg, rgba(251,188,5,1) 0%, rgba(0,207,217,1) 17%, rgba(129,97,255,1) 58%, rgba(255,255,255,1) 100%);
-background: -webkit-linear-gradient(114deg, rgba(251,188,5,1) 0%, rgba(0,207,217,1) 17%, rgba(129,97,255,1) 58%, rgba(255,255,255,1) 100%);
-background: linear-gradient(114deg, rgba(251,188,5,1) 0%, rgba(0,207,217,1) 17%, rgba(129,97,255,1) 58%, rgba(255,255,255,1) 100%);
-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fbbc05",endColorstr="#ffffff",GradientType=1); */
+
   position: absolute;
   content: "";
   z-index: 2;
@@ -54,8 +48,6 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fbbc05",endCo
 
 .main:after {
   content: "";
-  /* background-image: url("/assets/grid.svg"); */
-  
   z-index: 1;
   position: absolute;
   width: 100%;
@@ -63,9 +55,9 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fbbc05",endCo
   top: 0;
   opacity: 0.4;
   filter: invert(1);
-}
+} */
 
-.gradient {
+/* .gradient {
   height: fit-content;
   z-index: 3;
   width: 100%;
@@ -86,7 +78,7 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fbbc05",endCo
   filter: blur(100px) saturate(150%);
   top: 80px;
   opacity: 0.15;
-}
+} */
 
 @media screen and (max-width: 640px) {
   .main {
@@ -94,10 +86,10 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fbbc05",endCo
   }
 }
 
-.app {
-  @apply relative z-10 flex justify-center items-center flex-col;
-}
-
+/* .app {
+  @apply z-10 flex justify-start items-start flex-col;
+} */
+/* 
 .black_btn {
   @apply rounded-full border border-black bg-black py-1.5 px-5 text-white transition-all hover:bg-white hover:text-black text-center text-sm font-poppins flex items-center justify-center;
 }
@@ -132,7 +124,6 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fbbc05",endCo
 .search_input {
   @apply block w-full rounded-md border border-gray-200 bg-white py-2.5 font-poppins pl-5 pr-12 text-sm shadow-lg font-medium focus:border-black focus:outline-none focus:ring-0;
 }
-/* Form Component */
 .form_textarea {
   @apply w-full flex rounded-lg h-[200px] mt-2 p-3 text-sm text-gray-500 outline-0;
 }
@@ -141,7 +132,6 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fbbc05",endCo
   @apply w-full flex rounded-lg mt-2 p-3 text-sm text-gray-500 outline-0;
 }
 
-/* Nav Component */
 .logo_text {
   @apply max-sm:hidden font-poppins font-semibold text-lg text-black tracking-wide;
 }
@@ -174,4 +164,4 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fbbc05",endCo
 
 .flex-between {
   @apply flex justify-between items-center;
-}
+} */

@@ -16,9 +16,11 @@ export const GET = async (request, { params }) => {
 
     // console.log(fullUser);
     let userDetails = {
-      user: fullUser,
+      user: fullUser[0],
       roles: {},
     };
+    const findServiceProfile = await Service.findOne({user: fullUser[0]._id})
+    console.log(findServiceProfile + "findServiceProfile")
     console.log(fullUser[0].roles[0])
     // Fetch data for each role
     if (fullUser[0].roles[0].includes("Investor")) {
@@ -26,8 +28,8 @@ export const GET = async (request, { params }) => {
     }
     if (fullUser[0].roles[0].includes("Providers services")) {
         console.log("here")
-      const test =  userDetails.roles[0].Service = await Service.findOne({ user: fullUser[0]._id });
-      console.log(test + "")
+       userDetails.roles.Service = await Service.findOne({ user: fullUser[0]._id });
+
     }
     if (fullUser[0].roles[0].includes("CoFounder")) {
       userDetails.roles.CoFounder = await CoFounder.findOne({ user: fullUser[0]._id });
@@ -40,7 +42,7 @@ export const GET = async (request, { params }) => {
 
     console.log(userDetails);
 
-    return new Response(JSON.stringify(fullUser), { status: 200 });
+    return new Response(JSON.stringify(userDetails), { status: 200 });
   } catch (error) {
     return new Response("feild to bring the user from DB", { status: 500 });
   }

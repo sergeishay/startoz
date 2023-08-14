@@ -16,4 +16,4 @@ const EntrepreneurSchema = new mongoose.Schema({
   sector: String,
 });
 
-export default mongoose.models.Entrepreneur || mongoose.model('Entrepreneurs', EntrepreneurSchema);
+export default mongoose.models.Entrepreneur || mongoose.model('Entrepreneur', EntrepreneurSchema);
