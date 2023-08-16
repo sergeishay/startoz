@@ -1,19 +1,23 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const CoFounderSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  phoneNumber: String,
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  profilePhoto: String, // Assuming you're storing the direct URL as string.
   profession: String,
   lookingToBe: [String], // array of strings
   desiredSectors: [String], // array of strings
-  country: String,
-  city: String,
-  dateOfBirth: Date,
-  aboutMe: String,
-  experience: String,
+  yearsOfExperience: String, // This could also be a Number depending on your requirements.
   skills: [String], // array of strings
-  personalWeb: String,
-  linkedInProfileLink: String,
+  description: String,
+  dateOfBirth: Date,
+  country: String,
+  state: String,
+  city: String,
+  phone: String,
+  personalWebsite: String,
+  linkedInProfile: String,
+  cv: String,
 });
 
-export default mongoose.models.CoFounder || mongoose.model('CoFounder', CoFounderSchema);
+export default mongoose.models.CoFounder ||
+  mongoose.model("CoFounder", CoFounderSchema);

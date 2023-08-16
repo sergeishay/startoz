@@ -8,8 +8,6 @@ import User from "../app/models/user.js";
 import Image from "../app/models/Image.js";
 import CoFounder from "../app/models/coFounder.js";
 
-
-
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -32,7 +30,6 @@ async function savePhotosToLocal(formData) {
       const uploadDir = path.join(tempdir, `/${name}.${ext}`);
       fs.writeFile(uploadDir, buffer);
 
-
       return { filepath: uploadDir, filename: file.name };
     })
   );
@@ -41,13 +38,11 @@ async function savePhotosToLocal(formData) {
 
 async function uploadPhotosToCloudinary(newFiles) {
   const multipleUploadPromise = newFiles.map((file) =>
-    cloudinary.v2.uploader.upload(file.filepath, { folder: "startoz" })
+    cloudinary.v2.uploader.upload(file.filepath, { folder: "startoz/profileImage" })
   );
 
   return await Promise.all(multipleUploadPromise);
 }
-
-
 
 export async function uploadPhoto(formData, sessionEmail) {
   try {

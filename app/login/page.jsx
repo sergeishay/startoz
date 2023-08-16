@@ -53,7 +53,9 @@ const Login = () => {
 
 
   useEffect(() => {
-    fetchData()
+    if (user) {
+      fetchData()
+    }
   }, [fetchData]);
 
 

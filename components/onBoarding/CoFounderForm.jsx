@@ -1,431 +1,464 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { useState, useEffect, useRef, useContext } from "react";
+import { uploadPhoto } from "@/actions/uploadImage";
+import { uploadCv } from "@/actions/uploadFile";
 import axios from "axios";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import countryList from "react-select-country-list";
+import { Country, State, City } from "country-state-city";
+import "react-phone-number-input/style.css";
+import PhoneInput from "react-phone-number-input";
 import { toast } from "react-hot-toast";
-import { signIn, signOut, useSession, getProviders } from "next-auth/react";
-import Image from "next/image";
 
-// import { Storage } from "@google-cloud/storage"; // Import the Storage class from @google-cloud/storage
-import { uploadPhoto } from '@/actions/uploadActions';
+const CoFounderForm = ({ selectedRole }) => {
+  const lookingToBeOptions = [
+    "Other",
+    "CEO",
+    "CTO",
+    "ZBO",
+    "Programming",
+    "Design",
+    "Management",
+    "Marketing",
+    "Sales",
+  ];
 
-const CoFounderForm = ({ selectedRole, sessionEmail }) => {
-  console.log(sessionEmail); // add this to check the prop value
+  const desiredSectorOptions = [
+    "Other",
+    "Adtech",
+    "Cyber",
+    "Edtech",
+    "Fintech",
+    "Design",
+    "Managementtech",
+    "Healthtech",
+    "Sales",
+  ];
 
-  useEffect(() => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      sessionEmail: sessionEmail,
-    }));
-  }, [sessionEmail]);
+  const skillsOptions = [
+    "Other",
+    "Programming",
+    "Design",
+    "Management",
+    "Marketing",
+    "Sales",
+  ];
 
-  const [formValues, setFormValues] = useState({
-    sessionEmail: sessionEmail || "",
+  const [formInput, setFormInput] = useState({
     selectedRole: selectedRole,
+    profilePhoto: "",
     phoneNumber: "",
     profession: "",
     lookingToBe: [],
     desiredSectors: [],
     country: "",
     dateOfBirth: null,
-    aboutMe: "",
-    experience: "",
+    description: "",
     skills: [],
-    personalWeb: "",
-    linkedInProfileLink: "",
-    cv: null,
+    personalWebsite: "",
+    linkedInProfile: "",
+    cv: "",
     customLookingToBe: "",
     customSector: "",
     customSkill: "",
   });
   const [files, setFiles] = useState(null);
   const [urlFile, setUrlFile] = useState("");
-  const { data: session, status } = useSession();
-  const countryOptions = countryList().getData();
+  const [cv, setCv] = useState(null);
+  const [urlCv, setUrlCv] = useState("");
+  const { data: session } = useSession();
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedState, setSelectedState] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(null);
+  const [phoneNumber, setPhoneNumber] = useState(null);
+  const [showCustomLookingToBeInput, setShowCustomLookingToBeInput] =
+    useState(false);
+  const [showCustomDesiredSectorInput, setShowCustomDesiredSectorInput] =
+    useState(false);
+  const [showCustomSkillInput, setShowCustomSkillInput] = useState(false);
+  const [customLookingToBe, setCustomLookingToBe] = useState([]); // <-- Add this state
+  const [customDesiredSector, setCustomDesiredSector] = useState([]); // <-- Add this state
+  const [customSkill, setCustomSkill] = useState([]); // <-- Add this state
 
-  const handleLookingToBe = (selectedOptions) => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      lookingToBe: selectedOptions || [],
-    }));
-  };
-
-  const handleDesiredSectorsChange = (selectedOptions) => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      desiredSectors: selectedOptions || [],
-    }));
-  };
-
-  const handleSkillsChange = (selectedOptions) => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      skills: selectedOptions || [],
-    }));
-  };
-
-  const handleAddCustomRole = () => {
-    if (formValues.customLookingToBe) {
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        lookingToBe: [
-          ...prevValues.lookingToBe,
-          {
-            value: formValues.customLookingToBe,
-            label: formValues.customLookingToBe,
-          },
-        ],
-        customLookingToBe: "", // clear the custom input
-      }));
-    }
-  };
-
-  const handleAddCustomSector = () => {
-    if (formValues.customSector) {
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        desiredSectors: [
-          ...prevValues.desiredSectors,
-          { value: formValues.customSector, label: formValues.customSector },
-        ],
-        customSector: "", // clear the custom input
-      }));
-    }
-  };
-
-  const handleAddCustomSkill = () => {
-    if (formValues.customSkill) {
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        skills: [
-          ...prevValues.skills,
-          { value: formValues.customSkill, label: formValues.customSkill },
-        ],
-        customSkill: "", // clear the custom input
-      }));
-    }
-  };
-
+  useEffect(() => {
+    const sessionEmail = session?.user.email;
+    setFormInput((prev) => ({ ...prev, email: sessionEmail }));
+  }, [session]);
 
   const handleInputFile = async (e) => {
     const file = e.target.files[0];
-    console.log(file);
-    // const base64 = await convertBase64(file);
     const urlFormat = URL.createObjectURL(file);
-    console.log(file);
-    console.log(typeof file);
     setFiles(file);
     setUrlFile(urlFormat);
-  }
+    handleUploadFile(file);
+  };
 
-  const handleCountryChange = (selectedOption) => {
-    setFormValues((prevValues) => ({
+  const handleUploadFile = async (files) => {
+    const formData = new FormData();
+    formData.append("file", files);
+    const res = await uploadPhoto(formData);
+    console.log(res);
+    if (res.image) {
+      setFormInput((prev) => ({ ...prev, profilePhoto: res.image }));
+    }
+  };
+
+  const handleInputCv = async (e) => {
+    const file = e.target.files[0];
+    const urlFormat = URL.createObjectURL(file);
+    setCv(file);
+    setUrlCv(urlFormat);
+    handleUploadCv(file);
+  };
+
+  const handleUploadCv = async (files) => {
+    const formData = new FormData();
+    formData.append("file", files);
+    const res = await uploadCv(formData);
+    console.log(res);
+    if (res.image) {
+      setFormInput((prev) => ({ ...prev, cv: res.image }));
+    }
+  };
+
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+    console.log(formInput);
+    const stringifyForm = JSON.stringify(formInput);
+    try {
+      const response = await axios.post("/api/on-boarding", stringifyForm, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormInput((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCountryChange = (selectedCountry) => {
+    console.log(selectedCountry);
+    setSelectedCountry(selectedCountry);
+    setSelectedState(null);
+    setSelectedCity(null);
+    setFormInput((prevValues) => ({
       ...prevValues,
-      country: selectedOption.value,
+      country: selectedCountry.name,
     }));
   };
 
-  const handleChange = (e) => {
-    setFormValues((prevValues) => ({
+  const handleStateChange = (selectedState) => {
+    setSelectedState(selectedState);
+    setSelectedCity(null);
+    setFormInput((prevValues) => ({
       ...prevValues,
-      [e.target.name]: e.target.value,
+      state: selectedState.name,
+    }));
+  };
+
+  const handleCityChange = (selectedCity) => {
+    setSelectedCity(selectedCity);
+    setFormInput((prevValues) => ({
+      ...prevValues,
+      city: selectedCity.name,
     }));
   };
 
   const handleDateChange = (date) => {
-    setFormValues((prevValues) => ({
+    setFormInput((prevValues) => ({
       ...prevValues,
       dateOfBirth: date,
     }));
   };
 
-  const handleCVUpload = (e) => {
-    const file = e.target.files[0];
-    console.log(file + " line 121");
-    setFormValues((prevValues) => ({
+  const handleLookingToBeChange = (selectedOptions) => {
+    const values = selectedOptions.map((option) => option.value);
+    if (values.includes("Other")) {
+      setShowCustomLookingToBeInput(true);
+    } else {
+      setShowCustomLookingToBeInput(false);
+    }
+    setFormInput((prevValues) => ({
       ...prevValues,
-      cv: file,
+      lookingToBe: values.filter((val) => val !== "Other"), // Filter out the "Other" option
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    Object.keys(formValues).forEach((key) => {
-      if (key === "cv" && formValues[key]) {
-        formData.append(key, formValues[key], formValues[key].name);
-        console.log(formValues[key].name + " line 134");
-      } else if (Array.isArray(formValues[key])) {
-        formData.append(key, JSON.stringify(formValues[key]));
-      } else {
-        formData.append(key, formValues[key]);
-      }
-    });
-    console.log(files);
-    if(!urlFile.length) return alert('Please choose file');
-
-
-    formData.append('file', files) 
-    const res = await uploadPhoto(formData ,sessionEmail);
-    // Log FormData values
-    for (var pair of formData.entries()) {
-      console.log(pair[0] + ", " + pair[1]);
-    }
-
-    try {
-      const response = await axios.post("/api/on-boarding", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      console.log(response + "LINE 162");
-      toast.success("Form submitted successfully!");
-      resetForm();
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Failed to submit form. Please try again.");
+  const handleCustomLookingToBeChange = () => {
+    if (formInput.customLookingToBe) {
+      setCustomLookingToBe([...customLookingToBe, formInput.customLookingToBe]);
+      setFormInput((prevValues) => ({
+        ...prevValues,
+        lookingToBe: [...prevValues.lookingToBe, formInput.customLookingToBe], // Add the custom service type to the list
+        customLookingToBe: "", // clear the custom input
+      }));
     }
   };
 
-  const resetForm = () => {
-    setFormValues({
-      phoneNumber: "",
-      profession: "",
-      lookingToBe: [],
-      desiredSectors: [],
-      country: "",
-      dateOfBirth: null,
-      aboutMe: "",
-      experience: "",
-      skills: [],
-      personalWeb: "",
-      linkedInProfileLink: "",
-      cv: null,
-      customLookingToBe: "",
-      customSector: "",
-      customSkill: "",
-    });
+  const handleCustomLookingToBeInputChange = (e) => {
+    const { value } = e.target;
+    setFormInput((prev) => ({ ...prev, customLookingToBe: value }));
+  };
+
+  const handleDesiredSectorChange = (selectedOptions) => {
+    const values = selectedOptions.map((option) => option.value);
+    if (values.includes("Other")) {
+      setShowCustomDesiredSectorInput(true);
+    } else {
+      setShowCustomDesiredSectorInput(false);
+    }
+    setFormInput((prevValues) => ({
+      ...prevValues,
+      desiredSectors: values.filter((val) => val !== "Other"), // Filter out the "Other" option
+    }));
+  };
+
+  const handleCustomDesiredSectorChange = () => {
+    if (formInput.customDesiredSector) {
+      setCustomDesiredSector([
+        ...customDesiredSector,
+        formInput.customDesiredSector,
+      ]);
+      setFormInput((prevValues) => ({
+        ...prevValues,
+        desiredSectors: [
+          ...prevValues.desiredSectors,
+          formInput.customDesiredSector,
+        ], // Add the custom service type to the list
+        customDesiredSector: "", // clear the custom input
+      }));
+    }
+  };
+
+  const handleCustomSkillInputChange = (e) => {
+    const { value } = e.target;
+    setFormInput((prev) => ({ ...prev, customskill: value }));
+  };
+
+  const handleskillsChange = (selectedOptions) => {
+    const values = selectedOptions.map((option) => option.value);
+    if (values.includes("Other")) {
+      setShowCustomSkillInput(true);
+    } else {
+      setShowCustomSkillInput(false);
+    }
+    setFormInput((prevValues) => ({
+      ...prevValues,
+      skills: values.filter((val) => val !== "Other"), // Filter out the "Other" option
+    }));
+  };
+
+  const handleCustomSkillChange = () => {
+    if (formInput.customSkill) {
+      setCustomSkill([...customSkill, formInput.customSkill]);
+      setFormInput((prevValues) => ({
+        ...prevValues,
+        skills: [...prevValues.skills, formInput.customSkill], // Add the custom service type to the list
+        customSkill: "", // clear the custom input
+      }));
+    }
+  };
+
+  const handleCustomDesiredSectorInputChange = (e) => {
+    const { value } = e.target;
+    setFormInput((prev) => ({ ...prev, customDesiredSector: value }));
   };
 
   return (
-    <div>
-      <h2>Co-founder Form</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Phone Number:
-          <input
-            type="text"
-            name="phoneNumber"
-            value={formValues.phoneNumber}
-            onChange={handleChange}
-          />
-        </label>
-        <br />
-        <label>
-          Profession:
-          <input
-            type="text"
-            name="profession"
-            value={formValues.profession}
-            onChange={handleChange}
-          />
-        </label>
-        <br />
-        <label>
-          Looking to Be:
-          <Select
-            isMulti
-            name="lookingToBe"
-            options={[
-              { value: "CEO", label: "CEO" },
-              { value: "CTO", label: "CTO" },
-              { value: "COO", label: "COO" },
-              { value: "CFO", label: "CFO" },
-              { value: "CMO", label: "CMO" },
-              { value: "Other", label: "Other" },
-            ]}
-            value={formValues.lookingToBe}
-            onChange={handleLookingToBe}
-          />
-        </label>
-        {formValues.lookingToBe.some((option) => option.value === "Other") && (
-          <div>
-            <label>
-              Custom Role:
-              <input
-                type="text"
-                name="customLookingToBe"
-                value={formValues.customLookingToBe}
-                onChange={handleChange}
-              />
-            </label>
-            <button type="button" onClick={handleAddCustomRole}>
-              Add Custom Role
-            </button>
-          </div>
+    <form onSubmit={handleSubmitForm} className="flex flex-col justify-center">
+      <input type="file" name="file" onChange={handleInputFile} />
+      <div>
+        {urlFile && (
+          <Image src={urlFile} alt="image" width={200} height={200} />
         )}
-        <br />
-
-        <label>
-          Desired Sectors:
-          <Select
-            isMulti
-            name="desiredSectors"
-            options={[
-              { value: "Adtech", label: "Adtech" },
-              { value: "Cyber", label: "Cyber" },
-              { value: "Edtech", label: "Edtech" },
-              { value: "Fintech", label: "Fintech" },
-              { value: "Healthtech", label: "Healthtech" },
-              { value: "Other", label: "Other" },
-            ]}
-            value={formValues.desiredSectors}
-            onChange={handleDesiredSectorsChange}
-          />
-        </label>
-        {formValues.desiredSectors.some(
-          (option) => option.value === "Other"
-        ) && (
-            <div>
-              <label>
-                Custom Sector:
-                <input
-                  type="text"
-                  name="customSector"
-                  value={formValues.customSector}
-                  onChange={handleChange}
-                />
-              </label>
-              <button type="button" onClick={handleAddCustomSector}>
-                Add Custom Sector
-              </button>
-            </div>
-          )}
-
-        <br />
-        <label>
-          Country:
-          <Select
-            options={countryOptions}
-            value={countryOptions.find(
-              (option) => option.value === formValues.country
-            )}
-            onChange={handleCountryChange}
-          />
-        </label>
-        {/* <br />
-        <label>
-          City:
-          <Select
-            options={
-              formValues.country ? cityOptions[formValues.country] || [] : []
-            }
-            value={formValues.city}
-            onChange={handleCityChange}
-            isDisabled={!formValues.country}
-          />
-        </label> */}
-        <br />
-        <label>
-          Date of Birth:
-          <DatePicker
-            selected={formValues.dateOfBirth}
-            onChange={handleDateChange}
-            dateFormat="dd/MM/yyyy"
-            placeholderText="Select date"
-          />
-        </label>
-        <br />
-        <label>
-          About Me:
-          <textarea
-            name="aboutMe"
-            value={formValues.aboutMe}
-            onChange={handleChange}
-            rows={4}
-            maxLength={1000}
-          />
-        </label>
-        <br />
-        <label>
-          Experience:
-          <textarea
-            name="experience"
-            value={formValues.experience}
-            onChange={handleChange}
-            rows={4}
-          />
-        </label>
-        <br />
-        <label>
-          Skills:
-          <Select
-            isMulti
-            name="skills"
-            options={[
-              { value: "Programming", label: "Programming" },
-              { value: "Design", label: "Design" },
-              { value: "Management", label: "Management" },
-              { value: "Marketing", label: "Marketing" },
-              { value: "Sales", label: "Sales" },
-              { value: "Other", label: "Other" },
-            ]}
-            value={formValues.skills}
-            onChange={handleSkillsChange}
-          />
-        </label>
-        {formValues.skills.some((option) => option.value === "Other") && (
-          <div>
-            <label>
-              Other Skills:
-              <input
-                type="text"
-                name="customSkill"
-                value={formValues.customSkill}
-                onChange={handleChange}
-              />
-            </label>
-            <button type="button" onClick={handleAddCustomSkill}>
-              Add Custom Skill
-            </button>
-          </div>
+      </div>
+      <input
+        placeholder="What is your profession"
+        name="profession"
+        value={formInput.profession}
+        onChange={handleInputChange}
+      />
+      <Select
+        isMulti
+        placeholder="Looking to be"
+        name="lookingToBe"
+        options={lookingToBeOptions.map((lookingToBe) => ({
+          value: lookingToBe,
+          label: lookingToBe,
+        }))}
+        value={formInput.lookingToBe.map((lookingToBe) => ({
+          value: lookingToBe,
+          label: lookingToBe,
+        }))}
+        onChange={handleLookingToBeChange}
+      />
+      {showCustomLookingToBeInput && (
+        <>
+          <label>
+            Other Looking To Be:
+            <input
+              placeholder="Add your looking to te"
+              type="text"
+              name="customLookingToBe"
+              value={formInput.customLookingToBe}
+              onChange={handleCustomLookingToBeInputChange}
+            />
+          </label>
+          <button type="button" onClick={handleCustomLookingToBeChange}>
+            Add Custom Looking To Be
+          </button>
+        </>
+      )}
+      <Select
+        isMulti
+        placeholder="Desired Sector"
+        name="desiredSectors"
+        options={desiredSectorOptions.map((sector) => ({
+          value: sector,
+          label: sector,
+        }))}
+        value={formInput.desiredSectors.map((sector) => ({
+          value: sector,
+          label: sector,
+        }))}
+        onChange={handleDesiredSectorChange}
+      />
+      {showCustomDesiredSectorInput && (
+        <>
+          <label>
+            Other Sector:
+            <input
+              placeholder="Add your sector"
+              type="text"
+              name="customDesiredSector"
+              value={formInput.customDesiredSector}
+              onChange={handleCustomDesiredSectorInputChange}
+            />
+          </label>
+          <button type="button" onClick={handleCustomDesiredSectorChange}>
+            Add Custom Sector
+          </button>
+        </>
+      )}
+      <Select
+        options={Country.getAllCountries()}
+        getOptionLabel={(options) => options["name"]}
+        value={selectedCountry}
+        onChange={(selectedOption) => handleCountryChange(selectedOption)}
+      />
+      <Select
+        options={State?.getStatesOfCountry(selectedCountry?.isoCode)}
+        getOptionLabel={(options) => options["name"]}
+        value={selectedState}
+        onChange={(selectedOption) => handleStateChange(selectedOption)}
+      />
+      <Select
+        options={City.getCitiesOfState(
+          selectedState?.countryCode,
+          selectedState?.isoCode
         )}
-        <br />
-        <label>
-          Personal Website:
-          <input
-            type="text"
-            name="personalWeb"
-            value={formValues.personalWeb}
-            onChange={handleChange}
-          />
-        </label>
-        <br />
-        <label>
-          LinkedIn Profile Link:
-          <input
-            type="text"
-            name="linkedInProfileLink"
-            value={formValues.linkedInProfileLink}
-            onChange={handleChange}
-          />
-        </label>
-        <br />
-        <label>
-          Image:
-          <input type="file" name="file" onChange={handleInputFile} />
-          <div>
-            <Image src={urlFile} alt="image" width={200} height={200} />
-          </div>
-        </label>
-        <br />
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+        getOptionLabel={(options) => options["name"]}
+        value={selectedCity}
+        onChange={(selectedOption) => handleCityChange(selectedOption)}
+      />
+      <label>
+        Date of Birth:
+        <DatePicker
+          selected={formInput.dateOfBirth}
+          onChange={handleDateChange}
+          dateFormat="dd/MM/yyyy"
+          placeholderText="Select date"
+        />
+      </label>
+      <input
+        placeholder="Years of Experience"
+        name="yearsOfExperience"
+        value={formInput.yearsOfExperience}
+        onChange={handleInputChange}
+      />
+      <textarea
+        placeholder="Description"
+        name="description"
+        value={formInput.description}
+        onChange={handleInputChange}
+      ></textarea>
+      <Select
+        isMulti
+        placeholder="Skill"
+        name="skills"
+        options={skillsOptions.map((skill) => ({
+          value: skill,
+          label: skill,
+        }))}
+        value={formInput.skills.map((skill) => ({
+          value: skill,
+          label: skill,
+        }))}
+        onChange={handleskillsChange}
+      />
+      {showCustomSkillInput && (
+        <>
+          <label>
+            Other skill:
+            <input
+              placeholder="Add your skill"
+              type="text"
+              name="customskill"
+              value={formInput.customskill}
+              onChange={handleCustomSkillInputChange}
+            />
+          </label>
+          <button type="button" onClick={handleCustomSkillChange}>
+            Add Custom skill
+          </button>
+        </>
+      )}
+      <PhoneInput
+        placeholder="Enter phone number"
+        international
+        defaultCountry={selectedCountry?.isoCode}
+        value={phoneNumber}
+        countryCallingCodeEditable={false}
+        onChange={(phone) => {
+          setPhoneNumber(phone);
+          setFormInput((prev) => ({ ...prev, phone }));
+        }}
+      />
+      <input
+        placeholder="Personal Website"
+        name="personalWebsite"
+        value={formInput.personalWebsite}
+        onChange={handleInputChange}
+      />
+      <input
+        placeholder="LinkedIn Profile"
+        name="linkedInProfile"
+        value={formInput.linkedInProfile}
+        onChange={handleInputChange}
+      />
+      <input type="file" name="cv" onChange={handleInputCv} />
+      {urlCv && (
+        <div>
+          <embed src={urlCv} type="application/pdf" width="600" height="400" />
+        </div>
+      )}
+      <button
+        className="bg-sky-400 p-[7px] border-2 border-indigo-600"
+        type="submit"
+      >
+        Submit
+      </button>{" "}
+    </form>
   );
 };
 

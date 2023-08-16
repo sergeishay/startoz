@@ -41,7 +41,7 @@ export async function POST(request) {
     );
   }
 
-  const userRole = body.selectedRole.selectedRole;
+  const userRole = body.selectedRole;
   console.log(userRole);
 
   let newProfile;
